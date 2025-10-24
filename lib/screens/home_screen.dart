@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../providers/sensor_provider.dart';
-import '../widgets/responsive_sensor_card.dart';
+import '../widgets/sensor_card.dart';
+import '../l10n/l10n.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,30 +12,29 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isSmallScreen = size.width < 400;
-    
+    final double s = (size.width / 390).clamp(0.8, 1.6).toDouble();
     return Scaffold(
       backgroundColor: const Color(0xFF211D1D),
       body: Stack(
         children: [
-          // Arka plan görseli - Responsive ve büyütülmüş
+          // Arka plan görseli - Büyütülmüş ve konumlandırılmış
           Positioned(
-            top: -100, // Daha aşağı
-            left: -80, // Daha sağa (pozitif yönde)
+            top: -30 + (20 * (s - 1)),
+            left: -100 + (30 * (s - 1)),
             child: Image.asset(
               'images/Image_fx (48) 1 (1).png',
-              width: size.width * 1.8, // Ekran genişliğinin 1.8 katı
-              height: size.height * 0.7, // Ekran yüksekliğinin 0.7'si
+              width: 650 * s,
+              height: 600 * s,
               fit: BoxFit.cover,
             ),
           ),
 
-          // Gradient overlay - Alt kısım için
+          // Gradient overlay
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: size.height * 0.6,
+            height: size.height * 0.55,
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -49,12 +50,11 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Gradient overlay - Üst kısım için
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: size.height * 0.6,
+            height: size.height * 0.55,
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -75,68 +75,93 @@ class HomeScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: size.height -
+                  minHeight:
+                      MediaQuery.of(context).size.height -
                       MediaQuery.of(context).padding.top -
                       MediaQuery.of(context).padding.bottom,
                 ),
                 child: Column(
                   children: [
-                // NavBar
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isSmallScreen ? 12 : 20,
-                    vertical: isSmallScreen ? 12 : 16,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 24), // Sol boşluk
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            'Kontrol Paneli',
+                    // NavBar
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20 * s,
+                        vertical: 16 * s,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(width: 24 * s), // Sol boşluk
+                          Text(
+                            S.of(context).controlPanel,
                             style: GoogleFonts.manrope(
-                              fontSize: 17,
+                              fontSize: 17 * s,
                               fontWeight: FontWeight.w800,
                               color: const Color(0xFFF8F8F8),
                               height: 1.41,
                             ),
                           ),
-                        ),
+                          SizedBox(width: 24 * s),
+                        ],
                       ),
-                      // Bildirim ikonu
-                      IconButton(
-                        icon: const Icon(
-                          Icons.notifications_outlined,
-                          color: Color(0xFFF8F8F8),
-                          size: 24,
-                        ),
-                        onPressed: () {
-                          // Bildirimler sayfasına git
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
 
-                SizedBox(height: isSmallScreen ? 200 : size.height * 0.35),
-
-                // Sensor Kartları - Responsive
-                Consumer<SensorProvider>(
-                  builder: (context, provider, child) {
-                    final data = provider.latestData;
-
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen ? 12 : 20,
-                      ),
-                      child: isSmallScreen
-                          ? Column(
+                    // Bluetooth uyarı bandı (başlığın hemen altında)
+                    Consumer<SensorProvider>(
+                      builder: (context, prov, _) {
+                        final btOff =
+                            prov.bluetoothState != BluetoothAdapterState.on;
+                        if (!btOff) return const SizedBox.shrink();
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20 * s),
+                          child: Container(
+                            padding: EdgeInsets.all(12 * s),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.redAccent.withOpacity(0.4),
+                              ),
+                            ),
+                            child: Row(
                               children: [
-                                // Sıcaklık Kartı
-                                ResponsiveSensorCard(
-                                  title: 'Sıcaklık\nVerisi',
+                                Icon(
+                                  Icons.bluetooth_disabled,
+                                  color: Colors.redAccent,
+                                  size: 20 * s,
+                                ),
+                                SizedBox(width: 8 * s),
+                                Expanded(
+                                  child: Text(
+                                    S.of(context).bluetoothOff,
+                                    style: GoogleFonts.manrope(
+                                      color: const Color(0xFFF8F8F8),
+                                      fontSize: 12 * s,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    SizedBox(height: 150),
+
+                    // Sensor Kartları
+                    Consumer<SensorProvider>(
+                      builder: (context, provider, child) {
+                        final data = provider.latestData;
+
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20 * s),
+                          child: Row(
+                            children: [
+                              // Sıcaklık Kartı
+                              Expanded(
+                                child: SensorCard(
+                                  title: S.of(context).temperatureData,
                                   value:
                                       data != null
                                           ? '${data.temperature.toStringAsFixed(1)} C°'
@@ -145,10 +170,12 @@ class HomeScreen extends StatelessWidget {
                                   isEnabled: provider.temperatureSensorEnabled,
                                   onToggle: provider.toggleTemperatureSensor,
                                 ),
-                                const SizedBox(height: 12),
-                                // Basınç Kartı
-                                ResponsiveSensorCard(
-                                  title: 'Basınç\nVerisi',
+                              ),
+                              SizedBox(width: 16 * s),
+                              // Basınç Kartı
+                              Expanded(
+                                child: SensorCard(
+                                  title: S.of(context).pressureData,
                                   value:
                                       data != null
                                           ? '${(data.pressure / 1013 * 100).toStringAsFixed(0)}%'
@@ -157,125 +184,84 @@ class HomeScreen extends StatelessWidget {
                                   isEnabled: provider.pressureSensorEnabled,
                                   onToggle: provider.togglePressureSensor,
                                 ),
-                              ],
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Sıcaklık Kartı
-                                Flexible(
-                                  child: ResponsiveSensorCard(
-                                    title: 'Sıcaklık\nVerisi',
-                                    value:
-                                        data != null
-                                            ? '${data.temperature.toStringAsFixed(1)} C°'
-                                            : '-- C°',
-                                    icon: Icons.thermostat_outlined,
-                                    isEnabled: provider.temperatureSensorEnabled,
-                                    onToggle: provider.toggleTemperatureSensor,
-                                  ),
-                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
 
-                                const SizedBox(width: 12),
+                    SizedBox(height: 16 * s),
 
-                                // Basınç Kartı
-                                Flexible(
-                                  child: ResponsiveSensorCard(
-                                    title: 'Basınç\nVerisi',
-                                    value:
-                                        data != null
-                                            ? '${(data.pressure / 1013 * 100).toStringAsFixed(0)}%'
-                                            : '--%',
-                                    icon: Icons.speed_outlined,
-                                    isEnabled: provider.pressureSensorEnabled,
-                                    onToggle: provider.togglePressureSensor,
-                                  ),
-                                ),
-                              ],
+                    // Light (Nem) Kartı
+                    Consumer<SensorProvider>(
+                      builder: (context, provider, child) {
+                        final data = provider.latestData;
+
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20 * s),
+                          child: Container(
+                            width: double.infinity,
+                            height: 154 * s,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF282424),
+                              borderRadius: BorderRadius.circular(24 * s),
                             ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 12),
-
-                // Light (Nem) Kartı - Responsive
-                Consumer<SensorProvider>(
-                  builder: (context, provider, child) {
-                    final data = provider.latestData;
-
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen ? 12 : 20,
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        constraints: BoxConstraints(
-                          minHeight: isSmallScreen ? 140 : 154,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF282424),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            child: Padding(
+                              padding: EdgeInsets.all(20 * s),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Flexible(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            'Nem Oranı',
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            S.of(context).humidity,
                                             style: GoogleFonts.manrope(
-                                              fontSize: isSmallScreen ? 14 : 16,
+                                              fontSize: 16 * s,
                                               fontWeight: FontWeight.w600,
                                               color: const Color(0xFFF8F8F8),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: isSmallScreen ? 4 : 8),
-                                        FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            data != null
-                                                ? '${data.humidity.toStringAsFixed(1)}%'
-                                                : '--%',
-                                            style: GoogleFonts.manrope(
-                                              fontSize: isSmallScreen ? 36 : 48,
-                                              fontWeight: FontWeight.w500,
-                                              color: const Color(0xFFF8F8F8),
-                                              height: 1.0,
+                                          SizedBox(height: 8 * s),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              data != null
+                                                  ? '${data.humidity.toStringAsFixed(1)}%'
+                                                  : '--%',
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 48 * s,
+                                                fontWeight: FontWeight.w500,
+                                                color: const Color(0xFFF8F8F8),
+                                                height: 1.0,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
+                                        ],
+                                      ),
+                                      Icon(
+                                        Icons.water_drop_outlined,
+                                        color: const Color(
+                                          0xFFF8F8F8,
+                                        ).withOpacity(0.8),
+                                        size: 48 * s,
+                                      ),
+                                    ],
                                   ),
-                                  Icon(
-                                    Icons.water_drop_outlined,
-                                    color: const Color(
-                                      0xFFF8F8F8,
-                                    ).withOpacity(0.8),
-                                    size: isSmallScreen ? 36 : 48,
-                                  ),
-                                ],
-                              ),
                                   const Spacer(),
                                   // Bağlantı durumu göstergesi
                                   Row(
                                     children: [
                                       Container(
-                                        width: 8,
-                                        height: 8,
+                                        width: 8 * s,
+                                        height: 8 * s,
                                         decoration: BoxDecoration(
                                           color:
                                               provider.isUsingMockData
@@ -284,13 +270,13 @@ class HomeScreen extends StatelessWidget {
                                           shape: BoxShape.circle,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 8 * s),
                                       Text(
                                         provider.isUsingMockData
-                                            ? 'Demo Modu'
-                                            : 'ESP32 Bağlı',
+                                            ? S.of(context).demoMode
+                                            : S.of(context).esp32Connected,
                                         style: GoogleFonts.manrope(
-                                          fontSize: 12,
+                                          fontSize: 12 * s,
                                           fontWeight: FontWeight.w400,
                                           color: const Color(
                                             0xFFF8F8F8,
@@ -307,68 +293,7 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
 
-                    const SizedBox(height: 20),
-
-                    // Alt Navigation Bar
-                    Container(
-                      height: 84,
-                      decoration: const BoxDecoration(color: Color(0xFF211D1D)),
-                      child: Column(
-                        children: [
-                          // Tab bar
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                // Home (aktif)
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.home,
-                                    color: Color(0xFFFFB267),
-                                    size: 24,
-                                  ),
-                                  onPressed: () {},
-                                ),
-                                // Settings
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.settings_outlined,
-                                    color: const Color(
-                                      0xFFF8F8F8,
-                                    ).withOpacity(0.6),
-                                    size: 24,
-                                  ),
-                                  onPressed: () {},
-                                ),
-                                // Profile
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.person_outline,
-                                    color: const Color(
-                                      0xFFF8F8F8,
-                                    ).withOpacity(0.6),
-                                    size: 24,
-                                  ),
-                                  onPressed: () {},
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Spacer(),
-                          // Home Indicator
-                          Container(
-                            width: 134,
-                            height: 5,
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8F8F8),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    SizedBox(height: 20 * s),
                   ],
                 ),
               ),

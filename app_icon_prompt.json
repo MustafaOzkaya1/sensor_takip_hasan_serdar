@@ -1,0 +1,69 @@
+{
+  "style": "glossy gel-glass 3D app icon, luminous and soft, premium lighting, no frame, no border, no text",
+  "scene": "a sensor chip module representing IoT sensor monitoring and real-time data tracking, floating softly on a smooth gradient background",
+  "composition": {
+    "layout": "centered single object",
+    "perspective": "slight top-down",
+    "framing": "icon fully visible, no enclosing glass shape",
+    "aspect_ratio": "1:1"
+  },
+  "elements": {
+    "main_symbol": "temperature and humidity sensor chip with tiny circuit details",
+    "secondary_symbol": "none",
+    "symbol_style": "minimal, geometric, smooth edges",
+    "surface": "semi-transparent gel-glass with subtle reflection",
+    "inner_glow_intensity": 0.7,
+    "stripe_layers": {
+      "enabled": true,
+      "count": 4,
+      "direction": "horizontal",
+      "opacity": 0.25,
+      "color_blend_mode": "overlay"
+    }
+  },
+  "colors": {
+    "background_gradient": {
+      "mode": "linear",
+      "angle_deg": 135,
+      "stops": [
+        { "color": "#FFD4A3", "position": 0.0 },
+        { "color": "#FF9C5B", "position": 1.0 }
+      ],
+      "fill_canvas": true
+    },
+    "glass_tint": "#FFFFFF",
+    "symbol_fill": "#FFFFFF",
+    "lighting_highlight": "#FFEAD6",
+    "shadow_tint": "#8B4513",
+    "accent": "#FFB267"
+  },
+  "lighting": {
+    "key_light_angle_deg": 35,
+    "specular_strength": 0.7,
+    "ambient_strength": 0.25,
+    "subsurface_glow": true,
+    "soft_shadow": true
+  },
+  "geometry": {
+    "corner_radius": 24,
+    "depth": "medium",
+    "surface_smoothness": "high",
+    "bevel_strength": "soft"
+  },
+  "background": {
+    "style": "gradient_fill",
+    "vignette": "soft",
+    "noise": "none",
+    "glow": "subtle edge light",
+    "no_transparency": true
+  },
+  "constraints": {
+    "resolution": "4000x4000",
+    "export": "nontransparent_png",
+    "no_text": true,
+    "no_logo": true,
+    "no_outline_frame": true
+  },
+  "notes": "Do not include a glass square or border behind the icon. The gradient background must fill the entire canvas. Focus on the main object's glossy, gel-like depth. The sensor chip should have a warm, inviting orange glow that represents temperature monitoring."
+}
+
