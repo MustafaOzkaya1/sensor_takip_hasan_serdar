@@ -5,6 +5,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../providers/sensor_provider.dart';
 import '../widgets/sensor_card.dart';
 import '../l10n/l10n.dart';
+import '../widgets/line_chart.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,6 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF211D1D),
       body: Stack(
         children: [
-          // Arka plan görseli - Büyütülmüş ve konumlandırılmış
           Positioned(
             top: -30 + (20 * (s - 1)),
             left: -100 + (30 * (s - 1)),
@@ -28,8 +28,6 @@ class HomeScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Gradient overlay
           Positioned(
             top: 0,
             left: 0,
@@ -49,7 +47,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-
           Positioned(
             top: 0,
             left: 0,
@@ -69,8 +66,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // İçerik - SafeArea ve SingleChildScrollView ile
           SafeArea(
             child: SingleChildScrollView(
               child: ConstrainedBox(
@@ -82,7 +77,6 @@ class HomeScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // NavBar
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20 * s,
@@ -91,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SizedBox(width: 24 * s), // Sol boşluk
+                          SizedBox(width: 24 * s),
                           Text(
                             S.of(context).controlPanel,
                             style: GoogleFonts.manrope(
@@ -105,8 +99,6 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-
-                    // Bluetooth uyarı bandı (başlığın hemen altında)
                     Consumer<SensorProvider>(
                       builder: (context, prov, _) {
                         final btOff =
@@ -146,19 +138,14 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                     ),
-
                     SizedBox(height: 150),
-
-                    // Sensor Kartları
                     Consumer<SensorProvider>(
                       builder: (context, provider, child) {
                         final data = provider.latestData;
-
                         return Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20 * s),
                           child: Row(
                             children: [
-                              // Sıcaklık Kartı
                               Expanded(
                                 child: SensorCard(
                                   title: S.of(context).temperatureData,
@@ -167,22 +154,17 @@ class HomeScreen extends StatelessWidget {
                                           ? '${data.temperature.toStringAsFixed(1)} C°'
                                           : '-- C°',
                                   icon: Icons.thermostat_outlined,
-                                  isEnabled: provider.temperatureSensorEnabled,
-                                  onToggle: provider.toggleTemperatureSensor,
                                 ),
                               ),
                               SizedBox(width: 16 * s),
-                              // Basınç Kartı
                               Expanded(
                                 child: SensorCard(
                                   title: S.of(context).pressureData,
                                   value:
                                       data != null
-                                          ? '${(data.pressure / 1013 * 100).toStringAsFixed(0)}%'
-                                          : '--%',
+                                          ? '${data.pressure.toStringAsFixed(2)} hPa'
+                                          : '-- hPa',
                                   icon: Icons.speed_outlined,
-                                  isEnabled: provider.pressureSensorEnabled,
-                                  onToggle: provider.togglePressureSensor,
                                 ),
                               ),
                             ],
@@ -190,109 +172,33 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    SizedBox(height: 20 * s),
 
-                    SizedBox(height: 16 * s),
-
-                    // Light (Nem) Kartı
-                    Consumer<SensorProvider>(
-                      builder: (context, provider, child) {
-                        final data = provider.latestData;
-
-                        return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20 * s),
-                          child: Container(
-                            width: double.infinity,
-                            height: 154 * s,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF282424),
-                              borderRadius: BorderRadius.circular(24 * s),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(20 * s),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            S.of(context).humidity,
-                                            style: GoogleFonts.manrope(
-                                              fontSize: 16 * s,
-                                              fontWeight: FontWeight.w600,
-                                              color: const Color(0xFFF8F8F8),
-                                            ),
-                                          ),
-                                          SizedBox(height: 8 * s),
-                                          FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              data != null
-                                                  ? '${data.humidity.toStringAsFixed(1)}%'
-                                                  : '--%',
-                                              style: GoogleFonts.manrope(
-                                                fontSize: 48 * s,
-                                                fontWeight: FontWeight.w500,
-                                                color: const Color(0xFFF8F8F8),
-                                                height: 1.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Icon(
-                                        Icons.water_drop_outlined,
-                                        color: const Color(
-                                          0xFFF8F8F8,
-                                        ).withOpacity(0.8),
-                                        size: 48 * s,
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  // Bağlantı durumu göstergesi
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width: 8 * s,
-                                        height: 8 * s,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              provider.isUsingMockData
-                                                  ? Colors.orange
-                                                  : Colors.green,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      SizedBox(width: 8 * s),
-                                      Text(
-                                        provider.isUsingMockData
-                                            ? S.of(context).demoMode
-                                            : S.of(context).esp32Connected,
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 12 * s,
-                                          fontWeight: FontWeight.w400,
-                                          color: const Color(
-                                            0xFFF8F8F8,
-                                          ).withOpacity(0.6),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                    // Charts
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20 * s),
+                      child: Consumer<SensorProvider>(
+                        builder: (context, provider, _) {
+                          return Column(
+                            children: [
+                              SimpleLineChart(
+                                points: provider.temperatureHistory,
+                                title: 'Sıcaklık Grafiği',
+                                height: 120 * s,
+                                lineColor: const Color(0xFFFFB267),
                               ),
-                            ),
-                          ),
-                        );
-                      },
+                              SizedBox(height: 12 * s),
+                              SimpleLineChart(
+                                points: provider.pressureHistory,
+                                title: 'Basınç Grafiği',
+                                height: 120 * s,
+                                lineColor: const Color(0xFF66D1FF),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
-
                     SizedBox(height: 20 * s),
                   ],
                 ),

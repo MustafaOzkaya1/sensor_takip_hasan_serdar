@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../l10n/l10n.dart';
 
 class SensorCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  final bool isEnabled;
-  final VoidCallback onToggle;
 
   const SensorCard({
     super.key,
     required this.title,
     required this.value,
     required this.icon,
-    required this.isEnabled,
-    required this.onToggle,
   });
 
   @override
@@ -24,17 +19,12 @@ class SensorCard extends StatelessWidget {
       aspectRatio: 169 / 198,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Base tasarım 169x198'e göre ölçek
           final double scale = (constraints.maxWidth / 169).clamp(0.7, 2.0);
           final double padding = 20 * scale;
           final double titleFont = 12 * scale;
           final double valueFont = 32 * scale;
           final double iconSize = 24 * scale;
-          final double dividerTop = 14 * scale;
           final double spacerTop = 12 * scale;
-          final double switchWidth = 50 * scale;
-          final double switchHeight = 26 * scale;
-          final double knobSize = 20 * scale;
           final double radius = 24 * scale;
 
           return Container(
@@ -47,11 +37,9 @@ class SensorCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // İkon ve Değer
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Değer (ölçeklenebilir)
                       Expanded(
                         child: FittedBox(
                           alignment: Alignment.centerLeft,
@@ -78,7 +66,6 @@ class SensorCard extends StatelessWidget {
 
                   SizedBox(height: spacerTop),
 
-                  // Başlık
                   Text(
                     title,
                     style: GoogleFonts.manrope(
@@ -91,61 +78,6 @@ class SensorCard extends StatelessWidget {
                   ),
 
                   const Spacer(),
-
-                  // Çizgi
-                  Container(height: 1, color: const Color(0xFF393535)),
-
-                  SizedBox(height: dividerTop),
-
-                  // Aç/Kapa Switch
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        S.of(context).toggle,
-                        style: GoogleFonts.manrope(
-                          fontSize: titleFont,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFFF8F8F8).withOpacity(0.6),
-                          letterSpacing: 0.12 * scale,
-                          height: 1.2,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: onToggle,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: switchWidth,
-                          height: switchHeight,
-                          decoration: BoxDecoration(
-                            color:
-                                isEnabled
-                                    ? const Color(0xFFFFB267)
-                                    : const Color(0xFF393535),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: AnimatedAlign(
-                            duration: const Duration(milliseconds: 200),
-                            alignment:
-                                isEnabled
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                            child: Container(
-                              margin: EdgeInsets.symmetric(
-                                horizontal: 3 * scale,
-                              ),
-                              width: knobSize,
-                              height: knobSize,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF282424),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

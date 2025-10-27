@@ -13,36 +13,55 @@ class SensorProvider with ChangeNotifier {
   BluetoothAdapterState _bluetoothState = BluetoothAdapterState.unknown;
   String? _lastError;
 
+  // History buffers
+  final List<double> _temperatureHistory = <double>[];
+  final List<double> _pressureHistory = <double>[];
+  static const int _maxPoints = 200;
+
   SensorData? get latestData => _latestData;
   bool get isConnected => _isConnected;
-  bool get isUsingMockData => _esp32Service.isUsingMockData;
   bool get temperatureSensorEnabled => _temperatureSensorEnabled;
   bool get pressureSensorEnabled => _pressureSensorEnabled;
   BluetoothAdapterState get bluetoothState => _bluetoothState;
   String? get lastError => _lastError;
+
+  List<double> get temperatureHistory => List.unmodifiable(_temperatureHistory);
+  List<double> get pressureHistory => List.unmodifiable(_pressureHistory);
 
   SensorProvider() {
     _init();
   }
 
   void _init() {
-    // Veri akışını dinle
     _esp32Service.dataStream.listen((data) {
       _latestData = data;
+      // Append to histories
+      _appendPoint(_temperatureHistory, data.temperature);
+      _appendPoint(_pressureHistory, data.pressure);
       notifyListeners();
     });
 
-    // Bağlantı durumunu dinle
     _esp32Service.connectionState.listen((connected) {
       _isConnected = connected;
+      if (connected) {
+        // Reset history when a fresh connection is established
+        _temperatureHistory.clear();
+        _pressureHistory.clear();
+      }
       notifyListeners();
     });
 
-    // Bluetooth durumunu dinle
     FlutterBluePlus.adapterState.listen((state) {
       _bluetoothState = state;
       notifyListeners();
     });
+  }
+
+  void _appendPoint(List<double> buffer, double value) {
+    buffer.add(value);
+    if (buffer.length > _maxPoints) {
+      buffer.removeAt(0);
+    }
   }
 
   void toggleTemperatureSensor() {
@@ -75,7 +94,6 @@ class SensorProvider with ChangeNotifier {
     await _esp32Service.disconnect();
   }
 
-  // ESP32 kontrol placeholderları
   Future<void> restartESP32() async {
     _lastError = 'Henüz uygulanmadı';
     notifyListeners();

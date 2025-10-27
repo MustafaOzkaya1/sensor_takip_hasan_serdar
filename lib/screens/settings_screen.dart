@@ -132,21 +132,37 @@ class SettingsScreen extends StatelessWidget {
                         runSpacing: 8,
                         children: [
                           ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFB267),
+                              foregroundColor: Colors.black,
+                            ),
                             onPressed: sensor.scanAndConnect,
                             icon: const Icon(Icons.search),
                             label: Text(S.of(context).scanAndConnect),
                           ),
                           ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFB267),
+                              foregroundColor: Colors.black,
+                            ),
                             onPressed: sensor.disconnect,
                             icon: const Icon(Icons.link_off),
                             label: Text(S.of(context).disconnect),
                           ),
                           ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFB267),
+                              foregroundColor: Colors.black,
+                            ),
                             onPressed: sensor.restartESP32,
                             icon: const Icon(Icons.restart_alt),
                             label: Text(S.of(context).restartESP32),
                           ),
                           ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFB267),
+                              foregroundColor: Colors.black,
+                            ),
                             onPressed: sensor.clearErrors,
                             icon: const Icon(Icons.cleaning_services_outlined),
                             label: Text(S.of(context).clearErrors),
