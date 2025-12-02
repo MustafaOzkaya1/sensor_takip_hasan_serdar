@@ -1,6 +1,7 @@
 # 🌡️ ESP32 Sensör Takip Uygulaması
 
 ESP32 mikrodenetleyicisinden Bluetooth Low Energy (BLE) üzerinden sıcaklık, nem ve basınç verilerini alan modern bir Flutter uygulaması.
+HASAN SERDAR hocamızın verdiği projedir. Desteklerinden dolayı teşekkür ederiz.
 
 ## ✨ Özellikler
 
